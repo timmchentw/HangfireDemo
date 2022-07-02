@@ -1,6 +1,9 @@
 using Hangfire;
+using Hangfire.RecurringJobAdmin;
 using Hangfire.SqlServer;
+using HangfireDemo.Config;
 using HangfireDemo.Data;
+using HangfireDemo.Helpers.Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +35,8 @@ namespace HangfireDemo
         {
             string defaultConnectionString = Configuration.GetConnectionString("DefaultConnection");
 
+            services.Configure<HangfireConfig>(Configuration.GetSection(nameof(HangfireConfig)));
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(defaultConnectionString));
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -47,7 +53,8 @@ namespace HangfireDemo
                     QueuePollInterval = TimeSpan.Zero,
                     UseRecommendedIsolationLevel = true,
                     DisableGlobalLocks = true
-                }));
+                })
+                .UseRecurringJobAdmin(typeof(Startup).Assembly));
 
             // Add the processing server as IHostedService
             services.AddHangfireServer();
@@ -85,7 +92,19 @@ namespace HangfireDemo
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
-                endpoints.MapHangfireDashboard();
+                endpoints.MapHangfireDashboard(new DashboardOptions()
+                {
+                     Authorization = new[] { new UserAuthorizationFilter() },   // Only authorized user can access
+                });
+            });
+
+            // Custom hangfire settings
+            var hanfireConfig = app.ApplicationServices.GetService<IOptions<HangfireConfig>>().Value;
+            GlobalJobFilters.Filters.Add(new ProlongExpirationTimeAttribute(new TimeSpan(hanfireConfig.ProlongExpirationDays, 0, 0, 0)));
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute()
+            {
+                 Attempts = hanfireConfig.MaxRetryAttempts,
+                 DelaysInSeconds = hanfireConfig.DelaysInSeconds
             });
         }
     }
