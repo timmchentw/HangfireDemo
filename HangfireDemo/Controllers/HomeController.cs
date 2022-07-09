@@ -1,4 +1,5 @@
 ﻿using HangfireDemo.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,12 +19,8 @@ namespace HangfireDemo.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
@@ -32,6 +29,11 @@ namespace HangfireDemo.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult ApiDoc()
+        {
+            return View();
         }
     }
 }

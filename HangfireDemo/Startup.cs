@@ -3,6 +3,7 @@ using Hangfire.RecurringJobAdmin;
 using Hangfire.SqlServer;
 using HangfireDemo.Data;
 using HangfireDemo.Helpers.Hangfire;
+using HangfireDemo.Jobs;
 using HangfireDemo.Shared.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -59,9 +60,19 @@ namespace HangfireDemo
             // Add the processing server as IHostedService
             services.AddHangfireServer();
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)    // Do not use email verifivation
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
+
+            // Register services
+            services.AddTransient<IWebsiteJob, WebsiteJobDemo>();
+
+            // Add OpenAPI v3 document (Swagger)
+            services.AddOpenApiDocument(configure =>
+            {
+                configure.Title = "Hangfire Demo Job Api";
+                configure.Description = @"Generate, Enqueue, Delete Hangfire Jobs by Calling the APIs";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,9 +105,14 @@ namespace HangfireDemo
                 endpoints.MapRazorPages();
                 endpoints.MapHangfireDashboard(new DashboardOptions()
                 {
-                     Authorization = new[] { new UserAuthorizationFilter() },   // Only authorized user can access
+                    Authorization = new[] { new UserAuthorizationFilter() },   // Only authorized user can access
+                    AppPath = null, // Do not show "Go back" button in dashboard page
                 });
             });
+
+            // Add OpenAPI v3 document (Swagger)
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
 
             // Custom hangfire settings
             var hanfireConfig = app.ApplicationServices.GetService<IOptions<HangfireConfig>>().Value;
