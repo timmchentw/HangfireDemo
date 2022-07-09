@@ -14,7 +14,7 @@ namespace HangfireDemo.Shared
 {
     public static class Extensions
     {
-        public static IHostBuilder ConfigurSharedAppConfiguration(this IHostBuilder builder)
+        public static IHostBuilder ConfigureSharedAppConfiguration(this IHostBuilder builder)
         {
             return builder.ConfigureAppConfiguration((hostContext, config) =>
              {
@@ -34,17 +34,13 @@ namespace HangfireDemo.Shared
             {
                 var loggerInfo = getLoggerInfo(hostContext);
 
-                string jobNamespace = MethodBase.GetCurrentMethod().DeclaringType.Namespace;
-                var env = hostContext.HostingEnvironment;
-                var emailSinkInfo = new EmailConnectionInfo() { /*Assign Properties...*/ };
-
                 loggerConfig.MinimumLevel.Information()
                 .Enrich.WithProperty("Application", loggerInfo.ProgramNamespace)
                 .Enrich.WithProperty("Environment", hostContext.HostingEnvironment.EnvironmentName)
+                .WriteTo.Console()
                 .WriteTo.Conditional(
-                    condition => !env.IsDevelopment(),
-                    writeTo => writeTo.Console()
-                               .WriteTo.ApplicationInsights(new TelemetryConfiguration(loggerInfo.AppInsightsIntrumentalKey), TelemetryConverter.Traces)
+                    condition => loggerInfo.CanLog,
+                    writeTo => writeTo.ApplicationInsights(new TelemetryConfiguration(loggerInfo.AppInsightsIntrumentalKey), TelemetryConverter.Traces)
                                .WriteTo.Email(loggerInfo.EmailSinkInfo, restrictedToMinimumLevel: LogEventLevel.Error));
             });
         }

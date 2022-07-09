@@ -9,6 +9,7 @@ namespace HangfireDemo.Shared
     {
         public string ProgramNamespace { get; set; }
         public string AppInsightsIntrumentalKey { get; set; }
-        public EmailConnectionInfo EmailSinkInfo {get;set;}
+        public EmailConnectionInfo EmailSinkInfo { get; set; }
+        public bool CanLog { get; set; }
     }
 }

@@ -42,7 +42,9 @@ namespace HangfireDemo.Shared
                             Password = emailConfig.Password
                         } : null,
                     },
-                    ProgramNamespace = programNamespace
+                    ProgramNamespace = programNamespace,
+                    //CanLog = !hostContext.HostingEnvironment.IsDevelopment()  // Not log when "Develop"
+                    CanLog = false
                 };
             };
         }

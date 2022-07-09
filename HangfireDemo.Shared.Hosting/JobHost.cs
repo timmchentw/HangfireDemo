@@ -15,7 +15,7 @@ namespace HangfireDemo.Shared.Hosting
                         {
                             configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
                         })
-                        .ConfigurSharedAppConfiguration()
+                        .ConfigureSharedAppConfiguration()
                         .ConfigureSerilog(getLoggerInfo);
         }
     }
