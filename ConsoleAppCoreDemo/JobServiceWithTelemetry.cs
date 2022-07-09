@@ -1,4 +1,5 @@
 ﻿using HangfireDemo.Shared.Hosting;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppCoreDemo
 {
-    public class JobService : JobSeriveBase
+    public class JobServiceWithTelemetry : JobSeriveBaseWithTelemetry
     {
-        public JobService(ILogger<JobService> logger, IHostApplicationLifetime appLifetime)
-            : base(logger, appLifetime)
+        public JobServiceWithTelemetry(ILogger<JobServiceWithTelemetry> logger, IHostApplicationLifetime appLifetime, TelemetryClient telemetryClient)
+            : base(logger, appLifetime, telemetryClient)
         {
             // Init base constructor
         }
 
         protected override Task ExecuteAsync()
         {
-            Console.WriteLine("Sample");
+            Console.WriteLine("Sample with app insights");
             return Task.CompletedTask;
         }
     }

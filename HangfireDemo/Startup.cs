@@ -1,9 +1,9 @@
 using Hangfire;
 using Hangfire.RecurringJobAdmin;
 using Hangfire.SqlServer;
-using HangfireDemo.Config;
 using HangfireDemo.Data;
 using HangfireDemo.Helpers.Hangfire;
+using HangfireDemo.Shared.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;

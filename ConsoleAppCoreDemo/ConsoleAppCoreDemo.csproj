@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HangfireDemo.Shared.Hosting\HangfireDemo.Shared.Hosting.csproj" />
     <ProjectReference Include="..\HangfireDemo.Shared\HangfireDemo.Shared.csproj" />
   </ItemGroup>
 
