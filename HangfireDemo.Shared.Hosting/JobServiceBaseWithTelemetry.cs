@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,12 +13,14 @@ namespace HangfireDemo.Shared.Hosting
 {
     public class JobSeriveBaseWithTelemetry : IHostedService
     {
-        private readonly ILogger _logger;
+        protected readonly IHostEnvironment _env;
+        protected readonly IConfiguration _config;
+        protected readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly TelemetryClient _telemetryClient;
 
-        private readonly string _executionId;
-        private readonly string _jobNamespace;
+        protected readonly string _executionId;
+        protected readonly string _jobNamespace;
         private Exception _exception = null;
 
         /// <summary>
@@ -29,13 +32,15 @@ namespace HangfireDemo.Shared.Hosting
         /// <param name="logger"></param>
         /// <param name="appLifetime"></param>
         /// <param name="telemetryClient">You must register "services.AddApplicationInsightsTelemetryWorkerService()" for injecting this parameter</param>
-        public JobSeriveBaseWithTelemetry(ILogger<JobSeriveBaseWithTelemetry> logger, IHostApplicationLifetime appLifetime, TelemetryClient telemetryClient)
+        public JobSeriveBaseWithTelemetry(IHostEnvironment env, IConfiguration config, ILogger<JobSeriveBaseWithTelemetry> logger, IHostApplicationLifetime appLifetime, TelemetryClient telemetryClient, StartupValues startupValues)
         {
+            _env = env;
+            _config = config;
             _logger = logger;
             _appLifetime = appLifetime;
             _telemetryClient = telemetryClient;
 
-            _jobNamespace = GetType().Namespace;    // For distinguish the job
+            _jobNamespace = startupValues.ProgramNamespace;    // For distinguish the job
             _executionId = Guid.NewGuid().ToString("N");    // For checking which round
         }
 

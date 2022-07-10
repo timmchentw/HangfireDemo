@@ -15,9 +15,10 @@ namespace ConsoleAppCoreDemo
         static void Main(string[] args)
         {
             string jobNamespace = MethodBase.GetCurrentMethod().DeclaringType.Namespace;
+            var startupValues = new StartupValues() { ProgramNamespace = jobNamespace };
             var getLoggerInfo = LoggerInfoAccessor.GetInfo(jobNamespace);
 
-            JobHost.CreateJobHostBuilder(args, getLoggerInfo)
+            JobHost.CreateJobHostBuilder(args, startupValues, getLoggerInfo)
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<JobService>();    // Register job service

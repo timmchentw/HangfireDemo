@@ -1,5 +1,7 @@
-﻿using HangfireDemo.Shared.Hosting;
+﻿using HangfireDemo.Shared;
+using HangfireDemo.Shared.Hosting;
 using Microsoft.ApplicationInsights;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,8 +14,8 @@ namespace ConsoleAppCoreDemo
 {
     public class JobServiceWithTelemetry : JobSeriveBaseWithTelemetry
     {
-        public JobServiceWithTelemetry(ILogger<JobServiceWithTelemetry> logger, IHostApplicationLifetime appLifetime, TelemetryClient telemetryClient)
-            : base(logger, appLifetime, telemetryClient)
+        public JobServiceWithTelemetry(IHostEnvironment env, IConfiguration config, ILogger<JobServiceWithTelemetry> logger, IHostApplicationLifetime appLifetime, TelemetryClient telemetryClient, StartupValues startupValues)
+            : base(env, config, logger, appLifetime, telemetryClient, startupValues)
         {
             // Init base constructor
         }

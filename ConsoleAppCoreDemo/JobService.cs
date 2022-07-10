@@ -1,4 +1,6 @@
-﻿using HangfireDemo.Shared.Hosting;
+﻿using HangfireDemo.Shared;
+using HangfireDemo.Shared.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,8 +13,8 @@ namespace ConsoleAppCoreDemo
 {
     public class JobService : JobSeriveBase
     {
-        public JobService(ILogger<JobService> logger, IHostApplicationLifetime appLifetime)
-            : base(logger, appLifetime)
+        public JobService(IHostEnvironment env, IConfiguration config, ILogger<JobService> logger, IHostApplicationLifetime appLifetime, StartupValues startupValues)
+            : base(env, config, logger, appLifetime, startupValues)
         {
             // Init base constructor
         }

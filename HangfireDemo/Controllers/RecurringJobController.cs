@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using HangfireDemo.Jobs;
+using HangfireDemo.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace HangfireDemo.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class RecurringJobController : Controller
     {
-        IWebsiteJob _websiteJob;
+        IWebsiteJobService _websiteJob;
 
-        public RecurringJobController(IWebsiteJob websiteJob)
+        public RecurringJobController(IWebsiteJobService websiteJob)
         {
             _websiteJob = websiteJob;
         }
@@ -23,20 +23,19 @@ namespace HangfireDemo.Controllers
         [Route("[action]")]
         public IActionResult UpsertJob1(string cron)
         {
-            string recurringJobName = nameof(IWebsiteJob.RunJobDemo1);
+            string recurringJobName = nameof(IWebsiteJobService.RunJobDemo1);
             RecurringJob.AddOrUpdate(recurringJobName, () => _websiteJob.RunJobDemo1(), cron);
-            return new JsonResult("Created.");
+            return new JsonResult("Created: " + recurringJobName);
         }
 
         [HttpPost]
         [Route("[action]")]
         public IActionResult UpsertJob1Daily(int hour, int minute)
         {
-            string recurringJobName = nameof(IWebsiteJob.RunJobDemo1);
+            string recurringJobName = nameof(IWebsiteJobService.RunJobDemo1);
             RecurringJob.AddOrUpdate(recurringJobName, () => _websiteJob.RunJobDemo1(), Cron.Daily(hour, minute));
             return new JsonResult("Created: " + recurringJobName);
         }
-
 
         [HttpPut]
         [Route("[action]")]
@@ -46,10 +45,9 @@ namespace HangfireDemo.Controllers
             return new JsonResult("Triggerd: " + recurringJobName);
         }
 
-
         [HttpDelete]
         [Route("[action]")]
-        public IActionResult RemoveJob1(string recurringJobName)
+        public IActionResult DeleteJob1(string recurringJobName)
         {
             RecurringJob.RemoveIfExists(recurringJobName);
             return new JsonResult("Deleted: " + recurringJobName);

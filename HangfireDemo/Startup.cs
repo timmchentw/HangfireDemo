@@ -2,8 +2,10 @@ using Hangfire;
 using Hangfire.RecurringJobAdmin;
 using Hangfire.SqlServer;
 using HangfireDemo.Data;
+using HangfireDemo.Helpers;
 using HangfireDemo.Helpers.Hangfire;
-using HangfireDemo.Jobs;
+using HangfireDemo.Services;
+using HangfireDemo.Shared;
 using HangfireDemo.Shared.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace HangfireDemo
@@ -62,10 +65,13 @@ namespace HangfireDemo
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)    // Do not use email verifivation
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                    .AddNewtonsoftJson();   // This package can parse nullable object of parameter
 
             // Register services
-            services.AddTransient<IWebsiteJob, WebsiteJobDemo>();
+            services.AddTransient<IWebsiteJobService, WebsiteJobServiceDemo>();
+            services.AddTransient<IConsoleJobService, ConsoleJobServiceDemo>();
+            services.AddSingleton<StartupValues>(new StartupValues() { ProgramNamespace = MethodBase.GetCurrentMethod().DeclaringType.Namespace });
 
             // Add OpenAPI v3 document (Swagger)
             services.AddOpenApiDocument(configure =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,19 +11,23 @@ namespace HangfireDemo.Shared.Hosting
 {
     public class JobSeriveBase : IHostedService
     {
-        private readonly ILogger _logger;
+        protected readonly IHostEnvironment _env;
+        protected readonly IConfiguration _config;
+        protected readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
 
-        private readonly string _executionId;
-        private readonly string _jobNamespace;
+        protected readonly string _executionId;
+        protected readonly string _jobNamespace;
         private Exception _exception = null;
 
-        public JobSeriveBase(ILogger<JobSeriveBase> logger, IHostApplicationLifetime appLifetime)
+        public JobSeriveBase(IHostEnvironment env, IConfiguration config, ILogger<JobSeriveBase> logger, IHostApplicationLifetime appLifetime, StartupValues startupValues)
         {
+            _env = env;
+            _config = config;
             _logger = logger;
             _appLifetime = appLifetime;
 
-            _jobNamespace = GetType().Namespace;    // For distinguish the job
+            _jobNamespace = startupValues.ProgramNamespace;    // For distinguish the job
             _executionId = Guid.NewGuid().ToString("N");    // For checking which round
         }
 
